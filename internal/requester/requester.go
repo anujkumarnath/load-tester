@@ -19,7 +19,7 @@ func NewRequester(timeout time.Duration) *Requester {
 	}
 }
 
-func (r *Requester) Clean() {
+func (r *Requester) Close() {
 	r.client.CloseIdleConnections()
 }
 
