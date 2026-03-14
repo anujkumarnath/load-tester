@@ -11,10 +11,16 @@ type Requester struct {
 	client *http.Client
 }
 
+// NewRequester returns a pointer because Requester is a shared resource handle
+// intended to be reused across requests, not copied.
 func NewRequester(timeout time.Duration) *Requester {
 	return &Requester{
 		client: &http.Client{Timeout: timeout},
 	}
+}
+
+func (r *Requester) Clean() {
+	r.client.CloseIdleConnections()
 }
 
 func (r *Requester) Do(ctx context.Context, url string) Result {
