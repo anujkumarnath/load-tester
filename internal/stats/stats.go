@@ -68,10 +68,10 @@ func (s *Stats) Report() {
 		throughput = float64(totalRequests) / totalTime.Seconds()
 	}
 
-	fmt.Println("============ Report ============")
+	fmt.Println("\n============ Report ============")
 	fmt.Printf("Total Requests  :  %d\n",         totalRequests)
 	fmt.Printf("Throughput      :  %.2f req/s\n", throughput)
-	fmt.Printf("Error Rate      :  %.2f\n",       errorRate)
+	fmt.Printf("Error Rate      :  %.2f%%\n",     errorRate)
 	fmt.Println()
 
 	fmt.Println("Latency")
@@ -83,7 +83,7 @@ func (s *Stats) Report() {
 
 	fmt.Println("Status Codes")
 	for k, v := range s.statusCodes {
-		fmt.Printf("  %d  :%4d\n", k, v)
+		fmt.Printf("%5d  :%4d\n", k, v)
 	}
 	fmt.Println("================================")
 }
