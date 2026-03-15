@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 
+	"golang.org/x/time/rate"
+
 	"load-tester/internal/config"
 	"load-tester/internal/requester"
 	"load-tester/internal/stats"
@@ -16,6 +18,7 @@ type Pool struct {
 	// or wrap types that must not be copied (http.Client, sync.Mutex)
 	requester *requester.Requester
 	stats     *stats.Stats
+	limiter   *rate.Limiter
 }
 
 func NewPool(
@@ -23,10 +26,16 @@ func NewPool(
 	req   *requester.Requester,
 	stats *stats.Stats,
 ) *Pool {
+	var limiter *rate.Limiter
+	if cfg.RPS > 0 {
+		limiter = rate.NewLimiter(rate.Limit(cfg.RPS), cfg.Concurrency)
+	}
+
 	return &Pool{
 		config    : cfg,
 		requester : req,
 		stats     : stats,
+		limiter   : limiter,
 	}
 }
 
@@ -52,6 +61,14 @@ func (p *Pool) doWork(ctx context.Context, wg *sync.WaitGroup) {
 			return
 		default:
 			reqCtx, cancel := context.WithTimeout(ctx, reqTimeout)
+
+			if p.limiter != nil {
+				if err := p.limiter.Wait(reqCtx); err != nil {
+					cancel()
+					return
+				}
+			}
+
 			result := p.requester.Do(reqCtx, p.config.URL)
 			// Explicit call is required, defer will cause leak till the end of the loop
 			cancel()
