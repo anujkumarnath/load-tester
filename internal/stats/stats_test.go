@@ -79,7 +79,7 @@ func TestStats_ErrorCount(t *testing.T) {
 		s.Record(requester.Result{StatusCode: 200})
 	}
 
-	errCount := s.errorCount()
+	errCount := s.ErrorCount()
 
 	if errCount != 10 {
 		t.Errorf("expected 10 errors, found: %d", errCount)

@@ -22,6 +22,7 @@ type Stats struct {
 	// wall-clock throughput in Report(). Using result.Timestamp ensures accuracy
 	// even if Record() is called with a delay after the request completes.
 	startTime   time.Time
+	total       int
 }
 
 func NewStats() *Stats {
@@ -33,7 +34,7 @@ func NewStats() *Stats {
 func (s *Stats) Total() int {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return len(s.latency)
+	return s.total
 }
 
 // Record is safe for concurrent use. Called from every worker goroutine.
@@ -41,15 +42,19 @@ func (s *Stats) Record(result requester.Result) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if len(s.latency) == 0 {
+	if s.total == 0 {
 		s.startTime = result.Timestamp
 	}
 
-	s.latency = append(s.latency, result.Duration)
-	s.statusCodes[result.StatusCode]++
+	s.total++
+
 	if result.Error != "" {
 		s.errCount++
+		return
 	}
+
+	s.statusCodes[result.StatusCode]++
+	s.latency = append(s.latency, result.Duration)
 }
 
 // Report prints the final summary. Should be called after all workers have
@@ -59,19 +64,18 @@ func (s *Stats) Report() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	totalRequests := len(s.latency)
 	var errorRate, throughput float64
 
-	if totalRequests != 0 {
-		errorRate = float64(s.errCount) / float64(totalRequests) * 100
+	if s.total != 0 {
+		errorRate = float64(s.errCount) / float64(s.total) * 100
 		totalTime := time.Since(s.startTime)
-		throughput = float64(totalRequests) / totalTime.Seconds()
+		throughput = float64(s.total) / totalTime.Seconds()
 	}
 
 	fmt.Println("\n============ Report ============")
-	fmt.Printf("Total Requests  :  %d\n",         totalRequests)
+	fmt.Printf("Total Requests  :  %d\n",         s.total)
 	fmt.Printf("Throughput      :  %.2f req/s\n", throughput)
-	fmt.Printf("Error Rate      :  %.2f%%\n",     errorRate)
+	fmt.Printf("Error Rate      :  %.3f%%\n",     errorRate)
 	fmt.Println()
 
 	fmt.Println("Latency")
@@ -83,12 +87,12 @@ func (s *Stats) Report() {
 
 	fmt.Println("Status Codes")
 	for k, v := range s.statusCodes {
-		fmt.Printf("%5d  :%4d\n", k, v)
+		fmt.Printf("%5d  :%7d\n", k, v)
 	}
 	fmt.Println("================================")
 }
 
-// latencies, errorCount, statusCodeCounts exist for test access only.
+// latencies, statusCodeCounts exist for test access only.
 // They return safe copies under the lock so tests don't touch internal fields directly.
 func (s *Stats) latencies() []time.Duration {
 	s.mu.Lock()
@@ -96,7 +100,7 @@ func (s *Stats) latencies() []time.Duration {
 	return slices.Clone(s.latency)
 }
 
-func (s *Stats) errorCount() int {
+func (s *Stats) ErrorCount() int {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.errCount
