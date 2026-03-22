@@ -40,8 +40,8 @@ Running load test...
   Duration    : 10s
   Rate Limit  : 50 req/s
 
-[   1s]      57 reqs |    57.0 rps |       0 errors
-[   2s]     109 reqs |    52.0 rps |       0 errors
+[   1s]      56 reqs |    56.0 rps |       0 errors
+[   2s]     109 reqs |    53.0 rps |       0 errors
 [   3s]     159 reqs |    50.0 rps |       0 errors
 [   4s]     209 reqs |    50.0 rps |       0 errors
 [   5s]     259 reqs |    50.0 rps |       0 errors
@@ -59,10 +59,11 @@ Latency
   p50  :  1ms
   p95  :  1ms
   p99  :  2ms
-  max  :  1010ms
+  max  :  1011ms
 
 Status Codes
-  500  :    509
+  200  :    384
+  500  :    125
 ================================
 ```
 
@@ -77,24 +78,25 @@ Running load test...
   Duration    : 5s
   Rate Limit  : 0 req/s
 
-[   1s]    4098 reqs |  4098.0 rps |       0 errors
-[   2s]    7810 reqs |  3712.0 rps |       0 errors
-[   3s]   11542 reqs |  3732.0 rps |       0 errors
-[   4s]   15445 reqs |  3903.0 rps |       0 errors
+[   1s]    4004 reqs |  4004.0 rps |       0 errors
+[   2s]    8059 reqs |  4055.0 rps |       0 errors
+[   3s]   12124 reqs |  4065.0 rps |       0 errors
+[   4s]   16272 reqs |  4148.0 rps |       0 errors
 
 ============ Report ============
-Total Requests  :  19377
-Throughput      :  3872.38 req/s
-Error Rate      :  0.021%
+Total Requests  :  20433
+Throughput      :  4086.31 req/s
+Error Rate      :  0.020%
 
 Latency
   p50  :  1ms
   p95  :  1ms
   p99  :  2ms
-  max  :  6ms
+  max  :  3ms
 
 Status Codes
-  500  :  19373
+  200  :  15345
+  500  :   5084
 ================================
 ```
 
@@ -116,7 +118,7 @@ Running load test...
 
 ============ Report ============
 Total Requests  :  25
-Throughput      :  5.21 req/s
+Throughput      :  5.20 req/s
 Error Rate      :  0.000%
 
 Latency
@@ -126,7 +128,8 @@ Latency
   max  :  2ms
 
 Status Codes
-  500  :     25
+  200  :     23
+  500  :      2
 ================================
 ```
 
