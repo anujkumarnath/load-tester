@@ -27,7 +27,8 @@ type Stats struct {
 
 func NewStats() *Stats {
 	return &Stats{
-		statusCodes: map[int]int{},
+		statusCodes : map[int]int{},
+		startTime   : time.Now(),
 	}
 }
 
@@ -41,10 +42,6 @@ func (s *Stats) Total() int {
 func (s *Stats) Record(result requester.Result) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
-	if s.total == 0 {
-		s.startTime = result.Timestamp
-	}
 
 	s.total++
 
