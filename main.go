@@ -57,7 +57,7 @@ func main() {
 				lastTotal = total
 
 				fmt.Printf(
-					"[%4ds] %7d reqs | %7.1f rps | %7d errors\n",
+					"[%4ds] %7d reqs │ %7.1f rps │ %7d errors\n",
 					tick,
 					total,
 					rps,
